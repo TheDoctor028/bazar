@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/TheDoctor028/bazar/internal/utils"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"github.com/qor/admin"
@@ -27,7 +28,10 @@ func main() {
 	DB.AutoMigrate(&User{}, &Product{})
 
 	// Initalize
-	Admin := admin.New(&admin.AdminConfig{DB: DB})
+	Admin := admin.New(&admin.AdminConfig{
+		SiteName: utils.GetEnvOrDefault("SITE_NAME", "QOR Admin"),
+		DB:       DB,
+	})
 
 	// Create resources from GORM-backend model
 	Admin.AddResource(&User{})
@@ -39,6 +43,9 @@ func main() {
 	// Mount admin to the mux
 	Admin.MountTo("/admin", mux)
 
-	fmt.Println("Listening on: 8888")
-	http.ListenAndServe(":8888", mux)
+	PORT := utils.GetEnvOrDefault("PORT", "8888")
+	fmt.Println("Listening on: ", PORT)
+	if err := http.ListenAndServe(fmt.Sprintf(":%s", PORT), mux); err != nil {
+		panic(err)
+	}
 }
