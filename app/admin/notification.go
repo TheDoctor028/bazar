@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/TheDoctor028/bazar/internal/config/db"
-	"github.com/TheDoctor028/bazar/models/orders"
 	"github.com/qor/admin"
 	"github.com/qor/notification"
 	"github.com/qor/notification/channels/database"
@@ -16,29 +15,6 @@ import (
 func SetupNotification(Admin *admin.Admin) {
 	Notification := notification.New(&notification.Config{})
 	Notification.RegisterChannel(database.New(&database.Config{DB: db.DB}))
-	Notification.Action(&notification.Action{
-		Name: "Confirm",
-		Visible: func(data *notification.QorNotification, context *admin.Context) bool {
-			return data.ResolvedAt == nil
-		},
-		MessageTypes: []string{"order_returned"},
-		Handler: func(argument *notification.ActionArgument) error {
-			orderID := regexp.MustCompile(`#(\d+)`).FindStringSubmatch(argument.Message.Body)[1]
-			err := argument.Context.GetDB().Model(&orders.Order{}).Where("id = ? AND returned_at IS NULL", orderID).Update("returned_at", time.Now()).Error
-			if err == nil {
-				return argument.Context.GetDB().Model(argument.Message).Update("resolved_at", time.Now()).Error
-			}
-			return err
-		},
-		Undo: func(argument *notification.ActionArgument) error {
-			orderID := regexp.MustCompile(`#(\d+)`).FindStringSubmatch(argument.Message.Body)[1]
-			err := argument.Context.GetDB().Model(&orders.Order{}).Where("id = ? AND returned_at IS NOT NULL", orderID).Update("returned_at", nil).Error
-			if err == nil {
-				return argument.Context.GetDB().Model(argument.Message).Update("resolved_at", nil).Error
-			}
-			return err
-		},
-	})
 	Notification.Action(&notification.Action{
 		Name:         "Check it out",
 		MessageTypes: []string{"order_paid_cancelled", "order_processed", "order_returned"},

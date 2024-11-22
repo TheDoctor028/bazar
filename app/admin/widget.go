@@ -2,12 +2,10 @@ package admin
 
 import (
 	"errors"
-	"fmt"
 	"html/template"
 	"net/http"
 
 	"github.com/TheDoctor028/bazar/internal/config/db"
-	"github.com/TheDoctor028/bazar/models/products"
 	"github.com/qor/admin"
 	"github.com/qor/banner_editor"
 	"github.com/qor/l10n"
@@ -282,39 +280,6 @@ func SetupWidget(Admin *admin.Admin) {
 	Widgets.RegisterWidgetsGroup(&widget.WidgetsGroup{
 		Name:    "Banner",
 		Widgets: []string{"NormalBanner", "SlideShow"},
-	})
-
-	// selected Products
-	type selectedProductsArgument struct {
-		Products       []string
-		ProductsSorter sorting.SortableCollection
-	}
-	selectedProductsResource := Admin.NewResource(&selectedProductsArgument{})
-	selectedProductsResource.Meta(&admin.Meta{Name: "Products", Type: "select_many", Collection: func(value interface{}, context *qor.Context) [][]string {
-		var collectionValues [][]string
-		var products []*products.Product
-		context.GetDB().Find(&products)
-		for _, product := range products {
-			collectionValues = append(collectionValues, []string{fmt.Sprintf("%v", product.ID), product.Name})
-		}
-		return collectionValues
-	}})
-
-	Widgets.RegisterWidget(&widget.Widget{
-		Name:        "Products",
-		Templates:   []string{"products"},
-		Group:       "Products",
-		PreviewIcon: "/images/Widget-Products.png",
-		Setting:     selectedProductsResource,
-		Context: func(context *widget.Context, setting interface{}) *widget.Context {
-			if setting != nil {
-				var products []*products.Product
-				context.GetDB().Limit(9).Preload("ColorVariations").Where("id IN (?)", setting.(*selectedProductsArgument).Products).Find(&products)
-				setting.(*selectedProductsArgument).ProductsSorter.Sort(&products)
-				context.Options["Products"] = products
-			}
-			return context
-		},
 	})
 
 	// FooterLinks

@@ -6,7 +6,6 @@ import (
 	adminapp "github.com/TheDoctor028/bazar/app/admin"
 	"github.com/TheDoctor028/bazar/internal/config/application"
 	"github.com/TheDoctor028/bazar/internal/config/db"
-	"github.com/TheDoctor028/bazar/models/blogs"
 	"github.com/TheDoctor028/bazar/utils/funcmapmaker"
 	"github.com/qor/admin"
 	"github.com/qor/page_builder"
@@ -44,10 +43,6 @@ func (app App) ConfigureApplication(application *application.Application) {
 func (App) ConfigureAdmin(Admin *admin.Admin) {
 	Admin.AddMenu(&admin.Menu{Name: "Pages Management", Priority: 4})
 
-	// Blog Management
-	article := Admin.AddResource(&blogs.Article{}, &admin.Config{Menu: []string{"Pages Management"}})
-	article.IndexAttrs("ID", "VersionName", "ScheduledStartAt", "ScheduledEndAt", "Author", "Title")
-
 	// Setup pages
 	PageBuilderWidgets := widget.New(&widget.Config{DB: db.DB})
 	PageBuilderWidgets.WidgetSettingResource = Admin.NewResource(&adminapp.QorWidgetSetting{}, &admin.Config{Name: "PageBuilderWidgets"})
@@ -72,7 +67,6 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 
 	page := page_builder.New(&page_builder.Config{
 		Admin:       Admin,
-		PageModel:   &blogs.Page{},
 		Containers:  PageBuilderWidgets,
 		AdminConfig: &admin.Config{Name: "Pages", Menu: []string{"Pages Management"}, Priority: 1},
 	})

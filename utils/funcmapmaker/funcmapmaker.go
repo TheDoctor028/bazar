@@ -5,15 +5,9 @@ import (
 	"net/http"
 
 	"github.com/TheDoctor028/bazar/app/admin"
-	"github.com/TheDoctor028/bazar/internal/config"
 	"github.com/TheDoctor028/bazar/internal/config/i18n"
-	"github.com/TheDoctor028/bazar/models/products"
-	"github.com/TheDoctor028/bazar/models/seo"
-	"github.com/TheDoctor028/bazar/models/users"
 	"github.com/TheDoctor028/bazar/utils"
-	"github.com/qor/action_bar"
 	"github.com/qor/i18n/inline_edit"
-	"github.com/qor/qor"
 	"github.com/qor/render"
 	"github.com/qor/session"
 	"github.com/qor/session/manager"
@@ -58,44 +52,6 @@ func AddFuncMapMaker(view *render.Render) *render.Render {
 
 		funcMap["flashes"] = func() []session.Message {
 			return manager.SessionManager.Flashes(w, req)
-		}
-
-		// Add `action_bar` method
-		funcMap["render_action_bar"] = func() template.HTML {
-			return admin.ActionBar.Actions(action_bar.Action{Name: "Edit SEO", Link: seo.SEOCollection.SEOSettingURL("/help")}).Render(w, req)
-		}
-
-		funcMap["render_seo_tag"] = func() template.HTML {
-			return seo.SEOCollection.Render(&qor.Context{DB: utils.GetDB(req)}, "Default Page")
-		}
-
-		funcMap["get_categories"] = func() (categories []products.Category) {
-			utils.GetDB(req).Find(&categories)
-			return
-		}
-
-		funcMap["current_locale"] = func() string {
-			return utils.GetCurrentLocale(req)
-		}
-
-		funcMap["current_user"] = func() *users.User {
-			return utils.GetCurrentUser(req)
-		}
-
-		funcMap["related_products"] = func(cv products.ColorVariation) []products.Product {
-			var products []products.Product
-			utils.GetDB(req).Preload("ColorVariations").Limit(4).Find(&products, "id <> ?", cv.ProductID)
-			return products
-		}
-
-		funcMap["other_also_bought"] = func(cv products.ColorVariation) []products.Product {
-			var products []products.Product
-			utils.GetDB(req).Preload("ColorVariations").Order("id ASC").Limit(8).Find(&products, "id <> ?", cv.ProductID)
-			return products
-		}
-
-		funcMap["amazon_payment_gateway"] = func() interface{} {
-			return config.Config.AmazonPay
 		}
 
 		funcMap["format_price"] = func(price interface{}) string {

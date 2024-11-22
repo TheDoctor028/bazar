@@ -60,7 +60,6 @@ func (app App) ConfigureApplication(application *application.Application) {
 
 	SetupNotification(Admin)
 	SetupWorker(Admin)
-	SetupSEO(Admin)
 	SetupWidget(Admin)
 	SetupDashboard(Admin)
 

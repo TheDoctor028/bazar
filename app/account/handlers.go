@@ -3,7 +3,6 @@ package account
 import (
 	"net/http"
 
-	"github.com/TheDoctor028/bazar/models/orders"
 	"github.com/TheDoctor028/bazar/models/users"
 	"github.com/TheDoctor028/bazar/utils"
 	"github.com/qor/render"
@@ -30,19 +29,6 @@ func (ctrl Controller) Profile(w http.ResponseWriter, req *http.Request) {
 	ctrl.View.Execute("profile", map[string]interface{}{
 		"CurrentUser": currentUser, "DefaultBillingAddress": billingAddress, "DefaultShippingAddress": shippingAddress,
 	}, req, w)
-}
-
-// Orders orders page
-func (ctrl Controller) Orders(w http.ResponseWriter, req *http.Request) {
-	var (
-		Orders      []orders.Order
-		currentUser = utils.GetCurrentUser(req)
-		tx          = utils.GetDB(req)
-	)
-
-	tx.Preload("OrderItems").Where("state <> ? AND state != ?", orders.DraftState, "").Where(&orders.Order{UserID: &currentUser.ID}).Find(&Orders)
-
-	ctrl.View.Execute("orders", map[string]interface{}{"Orders": Orders}, req, w)
 }
 
 // Update update profile page

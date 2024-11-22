@@ -8,9 +8,7 @@ import (
 	adminapp "github.com/TheDoctor028/bazar/app/admin"
 	"github.com/TheDoctor028/bazar/app/api"
 	"github.com/TheDoctor028/bazar/app/home"
-	"github.com/TheDoctor028/bazar/app/orders"
 	"github.com/TheDoctor028/bazar/app/pages"
-	"github.com/TheDoctor028/bazar/app/products"
 	"github.com/TheDoctor028/bazar/app/static"
 	"github.com/TheDoctor028/bazar/internal/config"
 	"github.com/TheDoctor028/bazar/internal/config/application"
@@ -86,9 +84,7 @@ func main() {
 	Application.Use(api.New(&api.Config{}))
 	Application.Use(adminapp.New(&adminapp.Config{}))
 	Application.Use(home.New(&home.Config{}))
-	Application.Use(products.New(&products.Config{}))
 	Application.Use(account.New(&account.Config{}))
-	Application.Use(orders.New(&orders.Config{}))
 	Application.Use(pages.New(&pages.Config{}))
 	Application.Use(static.New(&static.Config{
 		Prefixs: []string{"/system"},

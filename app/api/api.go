@@ -3,8 +3,6 @@ package api
 import (
 	"github.com/TheDoctor028/bazar/internal/config/application"
 	"github.com/TheDoctor028/bazar/internal/config/db"
-	"github.com/TheDoctor028/bazar/models/orders"
-	"github.com/TheDoctor028/bazar/models/products"
 	"github.com/TheDoctor028/bazar/models/users"
 	"github.com/qor/admin"
 	"github.com/qor/qor"
@@ -32,26 +30,10 @@ type Config struct {
 func (app App) ConfigureApplication(application *application.Application) {
 	API := admin.New(&qor.Config{DB: db.DB})
 
-	Product := API.AddResource(&products.Product{})
-
-	ColorVariationMeta := Product.Meta(&admin.Meta{Name: "ColorVariations"})
-	ColorVariation := ColorVariationMeta.Resource
-	ColorVariation.IndexAttrs("ID", "Color", "Images", "SizeVariations")
-	ColorVariation.ShowAttrs("Color", "Images", "SizeVariations")
-
-	SizeVariationMeta := ColorVariation.Meta(&admin.Meta{Name: "SizeVariations"})
-	SizeVariation := SizeVariationMeta.Resource
-	SizeVariation.IndexAttrs("ID", "Size", "AvailableQuantity")
-	SizeVariation.ShowAttrs("ID", "Size", "AvailableQuantity")
-
-	API.AddResource(&orders.Order{})
-
 	API.AddResource(&users.User{})
 	// User := API.AddResource(&users.User{})
 	// userOrders, _ := User.AddSubResource("Orders")
 	// userOrders.AddSubResource("OrderItems", &admin.Config{Name: "Items"})
-
-	API.AddResource(&products.Category{})
 
 	application.Router.Mount(app.Config.Prefix, API.NewServeMux(app.Config.Prefix))
 }
